@@ -20,6 +20,7 @@
   <link rel="stylesheet" href="./css/components/post.css" />
   <link rel="stylesheet" href="./css/components/reply.css" />
   <link rel="stylesheet" href="./css/components/reactions.css" />
+  <link rel="stylesheet" href="./css/components/hashtag.css" />
   <link rel="stylesheet" href="./css/components/nav.css" />
 </head>
 <body>
@@ -83,6 +84,16 @@
       <div class="posts-feed" id="posts-feed">
         <p class="empty-state">Cargando chismes…</p>
       </div>
+    </section>
+
+    <!-- Vista: Feed filtrado por hashtag -->
+    <section class="view" data-view="tag" hidden>
+      <button class="btn-back" id="btn-tag-back">← Volver al feed</button>
+      <header class="tag-header">
+        <h2 class="tag-title">#<span id="tag-name"></span></h2>
+        <p class="tag-sub">Chismes con este tag</p>
+      </header>
+      <div class="posts-feed" id="tag-feed"></div>
     </section>
 
     <!-- Vista: Detalle de post (con respuestas anidadas) -->

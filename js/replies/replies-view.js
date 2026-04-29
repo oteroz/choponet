@@ -1,6 +1,7 @@
 // replies-view — convierte el array plano de respuestas en un árbol anidado.
 
 import { renderReactionBar } from '../reactions/reactions-view.js';
+import { escapeAndLinkifyHashtags } from '../utils/hashtags.js';
 
 function escapeHtml(str = '') {
   return String(str)
@@ -49,7 +50,7 @@ function buildReplyEl(reply, profile, postId, depth) {
       <span class="reply-author">${escapeHtml(reply.authorNick || 'Anónimo')}</span>
       <span class="reply-time">${formatTime(reply.createdAt)}</span>
     </header>
-    <div class="reply-body">${escapeHtml(reply.text)}</div>
+    <div class="reply-body">${escapeAndLinkifyHashtags(reply.text)}</div>
     <footer class="reply-footer">
       <div class="reactions-slot"></div>
       <button class="reply-respond-btn" type="button">Responder</button>

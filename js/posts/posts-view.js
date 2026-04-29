@@ -2,6 +2,7 @@
 
 import { renderReactionBar } from '../reactions/reactions-view.js';
 import { navigate } from '../router.js';
+import { escapeAndLinkifyHashtags } from '../utils/hashtags.js';
 
 function escapeHtml(str = '') {
   return String(str)
@@ -34,7 +35,7 @@ function buildPostCard(post, profile, { detail = false } = {}) {
       <span class="post-author">${escapeHtml(post.authorNick || 'Anónimo')}</span>
       <span class="post-time">${formatTime(post.createdAt)}</span>
     </header>
-    <div class="post-body">${escapeHtml(post.text)}</div>
+    <div class="post-body">${escapeAndLinkifyHashtags(post.text)}</div>
     <footer class="post-footer">
       <div class="reactions-slot"></div>
       <button class="post-reply-btn" type="button">
@@ -62,6 +63,7 @@ function buildPostCard(post, profile, { detail = false } = {}) {
   } else {
     card.addEventListener('click', (e) => {
       if (e.target.closest('.reactions-slot')) return;
+      if (e.target.closest('a')) return; // dejar que hashtags y otros links funcionen
       navigate(`#/post/${post.id}`);
     });
     card.style.cursor = 'pointer';

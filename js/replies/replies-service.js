@@ -13,6 +13,7 @@ import {
   updateDoc
 } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 import { db } from '../firebase-config.js';
+import { extractHashtags } from '../utils/hashtags.js';
 
 function repliesCol(postId) {
   return collection(db, 'choponet_posts', postId, 'replies');
@@ -31,7 +32,8 @@ export async function createReply(postId, parentReplyId, text, profile) {
     parentReplyId: parentReplyId || null,
     createdAt: serverTimestamp(),
     reactionCounts: {},
-    replyCount: 0
+    replyCount: 0,
+    hashtags: extractHashtags(trimmed)
   });
 
   await updateDoc(doc(db, 'choponet_posts', postId), {

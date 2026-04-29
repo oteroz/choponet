@@ -4,6 +4,7 @@ import {
   collection,
   addDoc,
   query,
+  where,
   orderBy,
   limit,
   onSnapshot,
@@ -12,6 +13,7 @@ import {
   deleteDoc
 } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 import { db } from '../firebase-config.js';
+import { extractHashtags } from '../utils/hashtags.js';
 
 const POSTS_COL = collection(db, 'choponet_posts');
 const FEED_LIMIT = 50;
@@ -28,7 +30,8 @@ export async function createPost(text, profile) {
     authorNick: profile.nick,
     createdAt: serverTimestamp(),
     reactionCounts: {},
-    replyCount: 0
+    replyCount: 0,
+    hashtags: extractHashtags(trimmed)
   });
 }
 
@@ -39,6 +42,23 @@ export function subscribeFeed(callback) {
     callback(posts);
   }, (err) => {
     console.error('Feed subscription error:', err);
+    callback([]);
+  });
+}
+
+export function subscribeByTag(tag, callback) {
+  const normalized = String(tag || '').toLowerCase();
+  const q = query(
+    POSTS_COL,
+    where('hashtags', 'array-contains', normalized),
+    orderBy('createdAt', 'desc'),
+    limit(FEED_LIMIT)
+  );
+  return onSnapshot(q, (snap) => {
+    const posts = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    callback(posts);
+  }, (err) => {
+    console.error(`Tag subscription error (#${normalized}):`, err);
     callback([]);
   });
 }

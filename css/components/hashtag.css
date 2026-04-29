@@ -1,0 +1,79 @@
+/* Hashtags — chip inline en posts/respuestas + vista filtrada por tag.
+   Mobile-first: tap targets cómodos, jerarquía clara, prioridad lectura. */
+
+/* Hashtag inline dentro del cuerpo de un post o respuesta */
+.hashtag {
+  display: inline-block;
+  color: var(--color-accent);
+  font-weight: 600;
+  text-decoration: none;
+  padding: 1px 4px;
+  margin: -1px 0;
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast), color var(--transition-fast);
+  /* Tap target mínimo en móvil: el padding ayuda al área tapeable */
+  min-height: 24px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.hashtag:hover,
+.hashtag:active {
+  background: var(--color-accent-soft);
+  color: var(--color-accent-hover);
+}
+
+/* Header de la vista filtrada por tag */
+.tag-header {
+  position: sticky;
+  top: var(--header-height);
+  z-index: 5;
+  background: var(--color-bg);
+  padding: var(--space-md) 0;
+  margin-bottom: var(--space-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tag-title {
+  font-size: var(--font-xl);
+  font-weight: 800;
+  color: var(--color-accent);
+  word-break: break-word;
+  line-height: 1.2;
+}
+
+.tag-sub {
+  font-size: var(--font-sm);
+  color: var(--color-text-dim);
+  margin-top: 2px;
+}
+
+/* Botón Volver — destacado en móvil para no perderse */
+#btn-tag-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) var(--space-md);
+  margin-bottom: var(--space-sm);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-dim);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  min-height: 40px;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+#btn-tag-back:hover,
+#btn-tag-back:active {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
+}
+
+@media (min-width: 768px) {
+  .tag-title {
+    font-size: 1.75rem;
+  }
+}

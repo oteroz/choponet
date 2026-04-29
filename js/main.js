@@ -11,7 +11,7 @@ import {
   logout,
   getCurrentProfile
 } from './auth/auth-service.js';
-import { subscribeFeed, createPost } from './posts/posts-service.js';
+import { subscribeFeed, subscribeByTag, createPost } from './posts/posts-service.js';
 import { renderFeed, renderPostDetail } from './posts/posts-view.js';
 import { subscribeReplies, createReply } from './replies/replies-service.js';
 import { renderRepliesTree } from './replies/replies-view.js';
@@ -51,6 +51,34 @@ registerRoute('/feed', () => {
 
   const feedEl = document.getElementById('posts-feed');
   unsubFeed = subscribeFeed((posts) => {
+    renderFeed(posts, feedEl, currentProfile);
+  });
+});
+
+registerRoute('/tag/:name', ({ name }) => {
+  if (!currentProfile) {
+    navigate('#/login');
+    return;
+  }
+  cleanupSubscriptions();
+  setBottomNavVisible(true);
+  showView('tag');
+
+  const tag = String(name || '').toLowerCase();
+  document.getElementById('tag-name').textContent = tag;
+
+  const feedEl = document.getElementById('tag-feed');
+  feedEl.innerHTML = '<div class="loading-state"><span class="spinner"></span><span>Cargando…</span></div>';
+
+  unsubFeed = subscribeByTag(tag, (posts) => {
+    if (!posts || posts.length === 0) {
+      const safe = document.createElement('p');
+      safe.className = 'empty-state';
+      safe.textContent = `Aún no hay chismes con #${tag}. ¡Sé el primero!`;
+      feedEl.innerHTML = '';
+      feedEl.appendChild(safe);
+      return;
+    }
     renderFeed(posts, feedEl, currentProfile);
   });
 });
@@ -217,6 +245,7 @@ document.getElementById('post-text').addEventListener('input', (e) => {
 });
 
 document.getElementById('btn-back').addEventListener('click', () => navigate('#/feed'));
+document.getElementById('btn-tag-back').addEventListener('click', () => navigate('#/feed'));
 
 document.getElementById('form-reply').addEventListener('submit', async (e) => {
   e.preventDefault();
