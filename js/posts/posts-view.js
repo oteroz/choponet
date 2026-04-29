@@ -25,15 +25,25 @@ function formatTime(ts) {
   return date.toLocaleDateString('es-DO', { day: 'numeric', month: 'short' });
 }
 
+const HOT_THRESHOLD = 5;
+
 function buildPostCard(post, profile, { detail = false } = {}) {
   const card = document.createElement('article');
   card.className = detail ? 'post post-detail-card' : 'post';
   card.dataset.postId = post.id;
 
+  const isHot = (post.reactionTotal || 0) >= HOT_THRESHOLD;
+  const hotBadge = isHot
+    ? `<span class="hot-badge" title="Este chisme está caliente">🔥 ${post.reactionTotal}</span>`
+    : '';
+
   card.innerHTML = `
     <header class="post-header">
       <span class="post-author">${escapeHtml(post.authorNick || 'Anónimo')}</span>
-      <span class="post-time">${formatTime(post.createdAt)}</span>
+      <div class="post-header-right">
+        ${hotBadge}
+        <span class="post-time">${formatTime(post.createdAt)}</span>
+      </div>
     </header>
     <div class="post-body">${escapeAndLinkifyHashtags(post.text)}</div>
     <footer class="post-footer">

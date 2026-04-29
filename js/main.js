@@ -11,7 +11,7 @@ import {
   logout,
   getCurrentProfile
 } from './auth/auth-service.js';
-import { subscribeFeed, subscribeByTag, createPost } from './posts/posts-service.js';
+import { subscribeFeed, subscribeFeedHot, subscribeByTag, createPost } from './posts/posts-service.js';
 import { renderFeed, renderPostDetail } from './posts/posts-view.js';
 import { subscribeReplies, createReply } from './replies/replies-service.js';
 import { renderRepliesTree } from './replies/replies-view.js';
@@ -21,6 +21,14 @@ let unsubFeed = null;
 let unsubPostDetail = null;
 let unsubReplies = null;
 let activePostId = null;
+
+const SORT_KEY = 'choponet:feed-sort';
+function getFeedSort() {
+  return localStorage.getItem(SORT_KEY) === 'hot' ? 'hot' : 'recent';
+}
+function setFeedSort(sort) {
+  localStorage.setItem(SORT_KEY, sort);
+}
 
 // ---- Service Worker (PWA) ----
 
@@ -40,6 +48,20 @@ registerRoute('/login', () => {
   showView('login');
 });
 
+function subscribeFeedBySort(sort, feedEl) {
+  feedEl.innerHTML = '<div class="loading-state"><span class="spinner"></span><span>Cargando chismes…</span></div>';
+  const subscriber = sort === 'hot' ? subscribeFeedHot : subscribeFeed;
+  return subscriber((posts) => {
+    renderFeed(posts, feedEl, currentProfile);
+  });
+}
+
+function applySortToToggle(sort) {
+  document.querySelectorAll('.feed-sort-btn').forEach((btn) => {
+    btn.setAttribute('aria-selected', btn.dataset.sort === sort ? 'true' : 'false');
+  });
+}
+
 registerRoute('/feed', () => {
   if (!currentProfile) {
     navigate('#/login');
@@ -49,10 +71,11 @@ registerRoute('/feed', () => {
   setBottomNavVisible(true);
   showView('feed');
 
+  const sort = getFeedSort();
+  applySortToToggle(sort);
+
   const feedEl = document.getElementById('posts-feed');
-  unsubFeed = subscribeFeed((posts) => {
-    renderFeed(posts, feedEl, currentProfile);
-  });
+  unsubFeed = subscribeFeedBySort(sort, feedEl);
 });
 
 registerRoute('/tag/:name', ({ name }) => {
@@ -275,6 +298,19 @@ document.querySelectorAll('#bottom-nav .nav-btn').forEach((btn) => {
   btn.addEventListener('click', () => {
     const route = btn.dataset.route;
     if (route) navigate(route);
+  });
+});
+
+// Feed sort toggle clicks
+document.querySelectorAll('.feed-sort-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const sort = btn.dataset.sort;
+    if (!sort || getFeedSort() === sort) return;
+    setFeedSort(sort);
+    applySortToToggle(sort);
+    if (unsubFeed) { unsubFeed(); unsubFeed = null; }
+    const feedEl = document.getElementById('posts-feed');
+    unsubFeed = subscribeFeedBySort(sort, feedEl);
   });
 });
 

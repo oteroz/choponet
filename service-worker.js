@@ -1,4 +1,4 @@
-const CACHE_NAME = 'choponet-v3';
+const CACHE_NAME = 'choponet-v4';
 const APP_SHELL = [
   './',
   './index.html',
@@ -11,6 +11,7 @@ const APP_SHELL = [
   './css/components/reply.css',
   './css/components/reactions.css',
   './css/components/hashtag.css',
+  './css/components/feed-sort.css',
   './css/components/nav.css',
   './js/main.js',
   './js/router.js',

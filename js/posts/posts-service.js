@@ -30,6 +30,7 @@ export async function createPost(text, profile) {
     authorNick: profile.nick,
     createdAt: serverTimestamp(),
     reactionCounts: {},
+    reactionTotal: 0,
     replyCount: 0,
     hashtags: extractHashtags(trimmed)
   });
@@ -42,6 +43,24 @@ export function subscribeFeed(callback) {
     callback(posts);
   }, (err) => {
     console.error('Feed subscription error:', err);
+    callback([]);
+  });
+}
+
+// Feed ordenado por reacciones totales (trending). Tiebreaker: más reciente primero.
+// Requiere índice compuesto en Firestore: reactionTotal DESC + createdAt DESC.
+export function subscribeFeedHot(callback) {
+  const q = query(
+    POSTS_COL,
+    orderBy('reactionTotal', 'desc'),
+    orderBy('createdAt', 'desc'),
+    limit(FEED_LIMIT)
+  );
+  return onSnapshot(q, (snap) => {
+    const posts = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    callback(posts);
+  }, (err) => {
+    console.error('Hot feed subscription error:', err);
     callback([]);
   });
 }

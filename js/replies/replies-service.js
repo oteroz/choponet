@@ -32,6 +32,7 @@ export async function createReply(postId, parentReplyId, text, profile) {
     parentReplyId: parentReplyId || null,
     createdAt: serverTimestamp(),
     reactionCounts: {},
+    reactionTotal: 0,
     replyCount: 0,
     hashtags: extractHashtags(trimmed)
   });

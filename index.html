@@ -21,6 +21,7 @@
   <link rel="stylesheet" href="./css/components/reply.css" />
   <link rel="stylesheet" href="./css/components/reactions.css" />
   <link rel="stylesheet" href="./css/components/hashtag.css" />
+  <link rel="stylesheet" href="./css/components/feed-sort.css" />
   <link rel="stylesheet" href="./css/components/nav.css" />
 </head>
 <body>
@@ -80,6 +81,15 @@
           <button type="submit" class="btn btn-primary">Publicar</button>
         </div>
       </form>
+
+      <div class="feed-sort" role="tablist" aria-label="Orden del feed">
+        <button class="feed-sort-btn" role="tab" data-sort="recent" aria-selected="true">
+          <span aria-hidden="true">🕐</span><span>Recientes</span>
+        </button>
+        <button class="feed-sort-btn" role="tab" data-sort="hot" aria-selected="false">
+          <span aria-hidden="true">🔥</span><span>Calientes</span>
+        </button>
+      </div>
 
       <div class="posts-feed" id="posts-feed">
         <p class="empty-state">Cargando chismes…</p>

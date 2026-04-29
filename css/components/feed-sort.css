@@ -1,0 +1,64 @@
+/* Feed sort toggle + hot badge.
+   Mobile-first: pill toggle de 2 botones, full-width en móvil para tap fácil. */
+
+.feed-sort {
+  display: flex;
+  gap: var(--space-xs);
+  padding: 4px;
+  margin-bottom: var(--space-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+}
+
+.feed-sort-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-xs);
+  padding: 10px var(--space-md);
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--color-text-dim);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  min-height: 40px;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.feed-sort-btn:hover {
+  color: var(--color-text);
+}
+
+.feed-sort-btn[aria-selected="true"] {
+  background: var(--color-accent);
+  color: white;
+}
+
+.feed-sort-btn[aria-selected="true"]:hover {
+  background: var(--color-accent-hover);
+  color: white;
+}
+
+/* Badge de fuego en posts trending */
+
+.hot-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 8px;
+  background: linear-gradient(135deg, #ff6b35, var(--color-accent));
+  color: white;
+  border-radius: var(--radius-pill);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 0 0 2px rgba(255, 51, 102, 0.15);
+  animation: hotPulse 2400ms ease-in-out infinite;
+}
+
+@keyframes hotPulse {
+  0%, 100% { box-shadow: 0 0 0 2px rgba(255, 51, 102, 0.15); }
+  50% { box-shadow: 0 0 0 4px rgba(255, 51, 102, 0.25); }
+}

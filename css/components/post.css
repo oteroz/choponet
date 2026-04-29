@@ -70,6 +70,12 @@
   margin-bottom: var(--space-sm);
 }
 
+.post-header-right {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
 .post-author {
   font-weight: 700;
   color: var(--color-accent);

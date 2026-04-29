@@ -50,7 +50,10 @@ export async function toggleReaction({ postId, replyId = null, emoji, profile })
 
   if (existing.exists()) {
     await deleteDoc(reactionRef);
-    await updateDoc(targetRef, { [fieldKey]: increment(-1) });
+    await updateDoc(targetRef, {
+      [fieldKey]: increment(-1),
+      reactionTotal: increment(-1)
+    });
     return false;
   } else {
     await setDoc(reactionRef, {
@@ -58,7 +61,10 @@ export async function toggleReaction({ postId, replyId = null, emoji, profile })
       emoji,
       createdAt: serverTimestamp()
     });
-    await updateDoc(targetRef, { [fieldKey]: increment(1) });
+    await updateDoc(targetRef, {
+      [fieldKey]: increment(1),
+      reactionTotal: increment(1)
+    });
     return true;
   }
 }

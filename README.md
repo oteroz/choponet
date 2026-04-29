@@ -137,3 +137,4 @@ choponet_posts/{postId}/replies/{replyId}/reactions/{uid}_{emoji}
 - **Error "Firebase: Error (auth/operation-not-allowed)"**: no habilitaste Anonymous o Email/Password en Authentication.
 - **El service worker da 404**: estás abriendo `index.html` por `file://`. Usa un servidor local.
 - **Error "The query requires an index"** al abrir un hashtag**: la primera vez que se filtre por tag, Firestore necesita un índice compuesto sobre `hashtags` (array-contains) + `createdAt` (desc). El error que muestra Firebase incluye un link directo — click ahí, **Create index**, espera ~1 minuto a que se construya, y refresca.
+- **Error "The query requires an index"** al activar el sort "Calientes"**: Firestore también necesita un índice compuesto sobre `reactionTotal` (desc) + `createdAt` (desc). Mismo flujo: link en el error → Create index → esperar.
