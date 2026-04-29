@@ -1,0 +1,22 @@
+# Archivos de uso local que NO deben subirse al repo público.
+
+# Reglas de Firestore mergeadas con otra app (contienen datos sensibles
+# del proyecto compartido como emails de admin)
+mira.txt
+firestore.rules.local.txt
+*.local.txt
+
+# OS / editor
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Archivos temporales
+*.tmp
+*.bak

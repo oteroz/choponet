@@ -1,0 +1,53 @@
+/* Bottom nav móvil */
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: var(--bottom-nav-height);
+  display: flex;
+  align-items: stretch;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  z-index: 50;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--color-text-dim);
+  font-size: 0.75rem;
+  transition: color var(--transition-fast);
+  min-height: 44px;
+}
+
+.nav-btn:hover,
+.nav-btn:active {
+  color: var(--color-accent);
+}
+
+.nav-icon {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.nav-label {
+  font-weight: 600;
+}
+
+@media (min-width: 768px) {
+  /* En desktop, bottom nav menos prominente */
+  .bottom-nav {
+    max-width: 640px;
+    margin: 0 auto;
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    border-left: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+  }
+}

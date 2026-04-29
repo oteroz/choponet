@@ -1,0 +1,101 @@
+// Firestore Security Rules para choponet (MVP).
+//
+// ⚠️ IMPORTANTE — proyecto compartido con otra app:
+// Este archivo contiene SOLO los bloques de choponet (namespace `choponet_`).
+// NO reemplaces tus reglas existentes. Pega los bloques `match` de abajo
+// DENTRO del bloque `match /databases/{database}/documents { ... }` de tus
+// reglas actuales, junto a los bloques de tu otra app.
+//
+// Estructura final esperada en Firebase Console:
+//
+//   rules_version = '2';
+//   service cloud.firestore {
+//     match /databases/{database}/documents {
+//
+//       // [...reglas de tu otra app...]
+//
+//       // [...bloques de choponet (todo lo que está abajo en este archivo)...]
+//     }
+//   }
+//
+// Si es la PRIMERA vez que defines reglas en este proyecto y no tienes
+// reglas previas, puedes pegar este archivo entero — las funciones helper
+// y la estructura ya están completas.
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ========== Helpers compartidos ==========
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+    function hasChoponetProfile() {
+      // Solo usuarios con profile en choponet_users pueden interactuar con
+      // datos de choponet. Esto bloquea sesiones autenticadas de la otra app.
+      return isSignedIn()
+             && exists(/databases/$(database)/documents/choponet_users/$(request.auth.uid));
+    }
+
+    // ========== INICIO bloques choponet ==========
+    // Pega desde aquí hasta "FIN bloques choponet" dentro de tu match existente.
+
+    // Contador atómico de guests (Chopo#N)
+    match /choponet_meta/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isSignedIn();
+    }
+
+    // Perfiles de usuarios choponet — cada user solo escribe el suyo.
+    // Permitimos lectura sin profile previo para que el bootstrap funcione.
+    match /choponet_users/{uid} {
+      allow read: if isSignedIn();
+      allow create, update: if isOwner(uid);
+      allow delete: if false;
+    }
+
+    // Posts: solo users con profile choponet pueden crear/leer
+    match /choponet_posts/{postId} {
+      allow read: if hasChoponetProfile();
+      allow create: if hasChoponetProfile()
+                    && request.resource.data.authorUid == request.auth.uid
+                    && request.resource.data.text is string
+                    && request.resource.data.text.size() > 0
+                    && request.resource.data.text.size() <= 500;
+      allow update: if hasChoponetProfile(); // increments de counts/replyCount
+      allow delete: if isOwner(resource.data.authorUid);
+
+      // Replies (subcolección)
+      match /replies/{replyId} {
+        allow read: if hasChoponetProfile();
+        allow create: if hasChoponetProfile()
+                      && request.resource.data.authorUid == request.auth.uid
+                      && request.resource.data.text is string
+                      && request.resource.data.text.size() > 0
+                      && request.resource.data.text.size() <= 300;
+        allow update: if hasChoponetProfile();
+        allow delete: if isOwner(resource.data.authorUid);
+
+        // Reacciones a respuestas
+        match /reactions/{reactionId} {
+          allow read: if hasChoponetProfile();
+          allow create, delete: if hasChoponetProfile()
+                                && reactionId.matches('^' + request.auth.uid + '_.*');
+          allow update: if false;
+        }
+      }
+
+      // Reacciones al post
+      match /reactions/{reactionId} {
+        allow read: if hasChoponetProfile();
+        allow create, delete: if hasChoponetProfile()
+                              && reactionId.matches('^' + request.auth.uid + '_.*');
+        allow update: if false;
+      }
+    }
+    // ========== FIN bloques choponet ==========
+  }
+}

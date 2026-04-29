@@ -1,0 +1,111 @@
+/* Reacciones — chips + picker */
+
+.reactions-bar {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-xs);
+}
+
+.reaction-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: var(--color-accent-soft);
+  border: 1px solid transparent;
+  border-radius: var(--radius-pill);
+  font-size: var(--font-sm);
+  color: var(--color-text);
+  transition: background var(--transition-fast), transform var(--transition-fast);
+  min-height: 32px;
+}
+
+.reaction-chip:hover {
+  background: var(--color-accent);
+  color: white;
+}
+
+.reaction-chip:active {
+  transform: scale(0.94);
+}
+
+.reaction-count {
+  font-weight: 700;
+  font-size: 0.8125rem;
+}
+
+.reaction-add {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-pill);
+  background: var(--color-surface-2);
+  color: var(--color-text-dim);
+  font-size: 1rem;
+  position: relative;
+  transition: background var(--transition-fast);
+}
+
+.reaction-add:hover {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+.reaction-add-plus {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  background: var(--color-accent);
+  color: white;
+  border-radius: 50%;
+  font-size: 0.625rem;
+  width: 14px;
+  height: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  border: 2px solid var(--color-surface);
+}
+
+/* Picker desplegable */
+
+.reaction-picker {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  right: 0;
+  display: none;
+  gap: var(--space-xs);
+  padding: var(--space-sm);
+  background: var(--color-surface-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+  z-index: 20;
+  flex-wrap: wrap;
+  max-width: 280px;
+}
+
+.reaction-picker.reaction-picker-open {
+  display: flex;
+}
+
+.reaction-picker-emoji {
+  font-size: 1.5rem;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--transition-fast), transform var(--transition-fast);
+}
+
+.reaction-picker-emoji:hover {
+  background: var(--color-accent-soft);
+  transform: scale(1.15);
+}

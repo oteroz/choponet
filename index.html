@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#ff3366" />
+  <meta name="description" content="Choponet — la red social del chisme dominicano" />
+
+  <title>Choponet — el chisme está aquí</title>
+
+  <link rel="manifest" href="./manifest.json" />
+  <link rel="icon" href="./icons/icon-192.png" />
+  <link rel="apple-touch-icon" href="./icons/icon-192.png" />
+
+  <link rel="stylesheet" href="./css/base.css" />
+  <link rel="stylesheet" href="./css/theme.css" />
+  <link rel="stylesheet" href="./css/layout.css" />
+  <link rel="stylesheet" href="./css/components/auth.css" />
+  <link rel="stylesheet" href="./css/components/post.css" />
+  <link rel="stylesheet" href="./css/components/reply.css" />
+  <link rel="stylesheet" href="./css/components/reactions.css" />
+  <link rel="stylesheet" href="./css/components/nav.css" />
+</head>
+<body>
+  <div id="toast" class="toast" hidden></div>
+
+  <header class="app-header">
+    <h1 class="brand">choponet<span class="brand-dot">.</span></h1>
+    <div class="user-tag" id="user-tag" hidden></div>
+  </header>
+
+  <main id="app">
+    <!-- Vista: Login / Landing -->
+    <section class="view" data-view="login" hidden>
+      <div class="auth-card">
+        <h2 class="auth-title">Entra al chisme</h2>
+        <p class="auth-sub">Modo anónimo o registro rápido. Sin email, sin vainas.</p>
+
+        <button class="btn btn-primary" id="btn-guest">Entrar como Chopo anónimo</button>
+
+        <div class="divider"><span>o</span></div>
+
+        <form class="auth-form" id="form-register">
+          <label class="field">
+            <span>Nick</span>
+            <input type="text" id="reg-nick" required minlength="3" maxlength="20" autocomplete="username" />
+          </label>
+          <label class="field">
+            <span>Pass</span>
+            <input type="password" id="reg-pass" required minlength="6" autocomplete="new-password" />
+          </label>
+          <button type="submit" class="btn btn-secondary">Registrarme</button>
+        </form>
+
+        <details class="auth-login">
+          <summary>¿Ya tienes cuenta? Entra</summary>
+          <form class="auth-form" id="form-login">
+            <label class="field">
+              <span>Nick</span>
+              <input type="text" id="log-nick" required autocomplete="username" />
+            </label>
+            <label class="field">
+              <span>Pass</span>
+              <input type="password" id="log-pass" required autocomplete="current-password" />
+            </label>
+            <button type="submit" class="btn btn-secondary">Entrar</button>
+          </form>
+        </details>
+      </div>
+    </section>
+
+    <!-- Vista: Feed -->
+    <section class="view" data-view="feed" hidden>
+      <form class="composer" id="form-post">
+        <textarea id="post-text" placeholder="¿Qué chisme tienes hoy?" maxlength="500" required></textarea>
+        <div class="composer-bar">
+          <span class="char-count" id="char-count">0 / 500</span>
+          <button type="submit" class="btn btn-primary">Publicar</button>
+        </div>
+      </form>
+
+      <div class="posts-feed" id="posts-feed">
+        <p class="empty-state">Cargando chismes…</p>
+      </div>
+    </section>
+
+    <!-- Vista: Detalle de post (con respuestas anidadas) -->
+    <section class="view" data-view="post" hidden>
+      <button class="btn-back" id="btn-back">← Volver</button>
+      <div class="post-detail" id="post-detail"></div>
+      <div class="replies-tree" id="replies-tree"></div>
+      <form class="reply-composer" id="form-reply">
+        <input type="hidden" id="reply-parent" value="" />
+        <textarea id="reply-text" placeholder="Responde al chisme…" maxlength="300" required></textarea>
+        <button type="submit" class="btn btn-secondary">Responder</button>
+      </form>
+    </section>
+  </main>
+
+  <nav class="bottom-nav" id="bottom-nav" hidden>
+    <button class="nav-btn" data-route="#/feed" aria-label="Feed">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Feed</span>
+    </button>
+    <button class="nav-btn" data-route="#/logout" aria-label="Salir">
+      <span class="nav-icon">🚪</span>
+      <span class="nav-label">Salir</span>
+    </button>
+  </nav>
+
+  <script type="module" src="./js/main.js"></script>
+</body>
+</html>
