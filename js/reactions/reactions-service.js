@@ -12,7 +12,16 @@ import {
 } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 import { db } from '../firebase-config.js';
 
-export const CHOPONET_EMOJIS = ['🔥', '💀', '😂', '😱', '👀', '🤡', '💯', '🍿'];
+// Set de emojis con sabor "choperia": fuego, drama, risa, escándalo,
+// chisme/voyeur, payasería, verdad cruda, chisme con popcorn, palmada en la
+// frente, ojos de fisgón, silencio cómplice, piedra (deadpan), reacciones
+// dominicanas clásicas en redes.
+export const CHOPONET_EMOJIS = [
+  '🔥', '💀', '😂', '🤣', '😱', '😳',
+  '👀', '🤡', '💯', '🍿', '🤦', '🙄',
+  '🤫', '🗿', '😏', '🙊', '👏', '💅',
+  '🫦', '🤨', '🥲', '😮‍💨'
+];
 
 function getTargetDocRef({ postId, replyId }) {
   if (replyId) return doc(db, 'choponet_posts', postId, 'replies', replyId);

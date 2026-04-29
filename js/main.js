@@ -68,6 +68,8 @@ registerRoute('/post/:id', ({ id }) => {
 
   const detailEl = document.getElementById('post-detail');
   const treeEl = document.getElementById('replies-tree');
+  detailEl.innerHTML = '<div class="loading-state"><span class="spinner"></span><span>Cargando chisme…</span></div>';
+  treeEl.innerHTML = '<div class="loading-state"><span class="spinner"></span><span>Cargando respuestas…</span></div>';
 
   unsubPostDetail = subscribeFeed((posts) => {
     const post = posts.find((p) => p.id === id);
@@ -136,48 +138,67 @@ async function applyProfileAndGoToFeed(profile, welcomeMsg) {
   navigate('#/feed');
 }
 
-document.getElementById('btn-guest').addEventListener('click', async () => {
+async function withLoading(btn, fn) {
+  btn.dataset.loading = 'true';
   try {
-    const profile = await loginAsGuest();
-    await applyProfileAndGoToFeed(profile, `Bienvenido, ${profile.nick}`);
-  } catch (err) {
-    console.error(err);
-    showToast('No pudimos entrarte como guest', 'error');
+    return await fn();
+  } finally {
+    delete btn.dataset.loading;
   }
+}
+
+document.getElementById('btn-guest').addEventListener('click', async (e) => {
+  await withLoading(e.currentTarget, async () => {
+    try {
+      const profile = await loginAsGuest();
+      await applyProfileAndGoToFeed(profile, `Bienvenido, ${profile.nick}`);
+    } catch (err) {
+      console.error(err);
+      showToast('No pudimos entrarte como guest', 'error');
+    }
+  });
 });
 
 document.getElementById('form-register').addEventListener('submit', async (e) => {
   e.preventDefault();
   const nick = document.getElementById('reg-nick').value.trim();
   const pass = document.getElementById('reg-pass').value;
-  try {
-    const profile = await registerUser(nick, pass);
-    await applyProfileAndGoToFeed(profile, `¡Bienvenido, ${nick}!`);
-  } catch (err) {
-    showToast(err.message || 'No pudimos registrarte', 'error');
-  }
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  await withLoading(submitBtn, async () => {
+    try {
+      const profile = await registerUser(nick, pass);
+      await applyProfileAndGoToFeed(profile, `¡Bienvenido, ${nick}!`);
+    } catch (err) {
+      showToast(err.message || 'No pudimos registrarte', 'error');
+    }
+  });
 });
 
 document.getElementById('form-login').addEventListener('submit', async (e) => {
   e.preventDefault();
   const nick = document.getElementById('log-nick').value.trim();
   const pass = document.getElementById('log-pass').value;
-  try {
-    await loginUser(nick, pass);
-    const profile = await getCurrentProfile();
-    if (!profile) throw new Error('No se encontró perfil de choponet');
-    await applyProfileAndGoToFeed(profile, `Hola de nuevo, ${nick}`);
-  } catch (err) {
-    showToast('Nick o pass incorrectos', 'error');
-  }
+  const submitBtn = e.target.querySelector('button[type="submit"]');
+  await withLoading(submitBtn, async () => {
+    try {
+      await loginUser(nick, pass);
+      const profile = await getCurrentProfile();
+      if (!profile) throw new Error('No se encontró perfil de choponet');
+      await applyProfileAndGoToFeed(profile, `Hola de nuevo, ${nick}`);
+    } catch (err) {
+      showToast('Nick o pass incorrectos', 'error');
+    }
+  });
 });
 
 document.getElementById('form-post').addEventListener('submit', async (e) => {
   e.preventDefault();
   if (!currentProfile) return;
   const textEl = document.getElementById('post-text');
+  const submitBtn = e.target.querySelector('button[type="submit"]');
   const text = textEl.value.trim();
   if (!text) return;
+  submitBtn.dataset.loading = 'true';
   try {
     await createPost(text, currentProfile);
     textEl.value = '';
@@ -186,6 +207,8 @@ document.getElementById('form-post').addEventListener('submit', async (e) => {
   } catch (err) {
     console.error(err);
     showToast('No pudimos publicar', 'error');
+  } finally {
+    delete submitBtn.dataset.loading;
   }
 });
 
@@ -199,17 +222,22 @@ document.getElementById('form-reply').addEventListener('submit', async (e) => {
   e.preventDefault();
   if (!currentProfile || !activePostId) return;
   const textEl = document.getElementById('reply-text');
+  const submitBtn = e.target.querySelector('button[type="submit"]');
   const text = textEl.value.trim();
   const parentReplyId = document.getElementById('reply-parent').value || null;
   if (!text) return;
+  submitBtn.dataset.loading = 'true';
   try {
     await createReply(activePostId, parentReplyId, text, currentProfile);
     textEl.value = '';
     document.getElementById('reply-parent').value = '';
+    document.getElementById('reply-text').placeholder = 'Responde al chisme…';
     showToast('Respuesta enviada', 'success');
   } catch (err) {
     console.error(err);
     showToast('No pudimos enviar la respuesta', 'error');
+  } finally {
+    delete submitBtn.dataset.loading;
   }
 });
 

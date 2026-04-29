@@ -1,12 +1,15 @@
 # Iconos PWA
 
-Para que la PWA funcione completa, coloca aquí dos imágenes PNG:
+Iconos auto-generados por `scripts/generate-icons.py` (requiere Pillow).
 
-- `icon-192.png` (192×192 px)
-- `icon-512.png` (512×512 px)
+Para regenerarlos tras cambiar la marca:
 
-**Generador rápido recomendado:**
-- https://realfavicongenerator.net
-- https://www.pwabuilder.com/imageGenerator
+```bash
+pip install Pillow
+python scripts/generate-icons.py
+```
 
-Mientras no estén los archivos, el sitio funciona pero el navegador no permitirá "instalar" la app y la pestaña usará un icono genérico.
+Salida:
+- `icon-192.png` — icono PWA 192×192
+- `icon-512.png` — icono PWA 512×512
+- `favicon.png` — favicon 32×32 para la pestaña del navegador

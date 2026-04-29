@@ -1,4 +1,4 @@
-const CACHE_NAME = 'choponet-v1';
+const CACHE_NAME = 'choponet-v2';
 const APP_SHELL = [
   './',
   './index.html',
@@ -25,7 +25,8 @@ const APP_SHELL = [
   './js/ui/view-manager.js',
   './js/ui/toast.js',
   './icons/icon-192.png',
-  './icons/icon-512.png'
+  './icons/icon-512.png',
+  './icons/favicon.png'
 ];
 
 self.addEventListener('install', (event) => {
