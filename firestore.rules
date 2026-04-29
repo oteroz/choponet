@@ -55,6 +55,17 @@ service cloud.firestore {
       allow read: if isSignedIn();
       allow create, update: if isOwner(uid);
       allow delete: if false;
+
+      // Notificaciones: solo el dueño lee/borra. Cualquier otro user con
+      // profile choponet puede CREAR notifs en la inbox de uid (siempre que
+      // se identifique como actor y no sea el mismo dueño).
+      match /notifications/{notifId} {
+        allow read: if isOwner(uid);
+        allow update, delete: if isOwner(uid);
+        allow create: if hasChoponetProfile()
+                      && request.auth.uid != uid
+                      && request.resource.data.actorUid == request.auth.uid;
+      }
     }
 
     // Posts: solo users con profile choponet pueden crear/leer

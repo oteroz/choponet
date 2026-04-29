@@ -86,6 +86,19 @@ Coloca `icon-192.png` y `icon-512.png` en `icons/`. Generadores recomendados:
 - https://realfavicongenerator.net
 - https://www.pwabuilder.com/imageGenerator
 
+## Notificaciones in-app
+
+Cada usuario tiene una inbox personal en `choponet_users/{uid}/notifications/{notifId}`. Las notifs se generan automáticamente desde el cliente cuando:
+
+- Alguien responde tu chisme → `type: 'reply'`
+- Alguien responde tu comentario → `type: 'reply-to-reply'`
+- Alguien reacciona a tu chisme → `type: 'reaction-post'`
+- Alguien reacciona a tu comentario → `type: 'reaction-reply'`
+
+Reglas: solo el dueño de la inbox puede leer/marcar/borrar; cualquier user con profile choponet puede crear notifs (con su uid firmando como actor) excepto en su propia inbox.
+
+⚠️ **Si actualizas el proyecto** y ya tenías rules publicadas: hay que re-publicar las nuevas rules (con el bloque de `notifications` añadido) para que las notifs no fallen con permission-denied. Ver paso "Pegar las Security Rules" arriba.
+
 ## Modelo de datos (Firestore)
 
 > **Nota:** todas las colecciones usan el prefijo `choponet_` porque el proyecto Firebase (`testfire-27c40`) está compartido con otra app. Las reglas exigen tener un doc en `choponet_users/{uid}` para acceder a las demás colecciones — esto aísla las sesiones autenticadas de la otra app.
@@ -118,6 +131,16 @@ choponet_posts/{postId}/reactions/{uid}_{emoji}
 
 choponet_posts/{postId}/replies/{replyId}/reactions/{uid}_{emoji}
   └─ uid, emoji, createdAt
+
+choponet_users/{uid}/notifications/{notifId}
+  ├─ type: 'reply' | 'reply-to-reply' | 'reaction-post' | 'reaction-reply'
+  ├─ actorUid, actorNick
+  ├─ postId
+  ├─ replyId: string | null
+  ├─ emoji: string | null
+  ├─ snippet: string
+  ├─ createdAt
+  └─ read: boolean
 ```
 
 ## Roadmap post-MVP (ideas para iterar)

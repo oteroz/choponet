@@ -9,11 +9,13 @@ import {
   onSnapshot,
   serverTimestamp,
   doc,
+  getDoc,
   increment,
   updateDoc
 } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 import { db } from '../firebase-config.js';
 import { extractHashtags } from '../utils/hashtags.js';
+import { createNotification, snippetOf } from '../notifications/notifications-service.js';
 
 function repliesCol(postId) {
   return collection(db, 'choponet_posts', postId, 'replies');
@@ -45,6 +47,28 @@ export async function createReply(postId, parentReplyId, text, profile) {
     await updateDoc(doc(db, 'choponet_posts', postId, 'replies', parentReplyId), {
       replyCount: increment(1)
     });
+  }
+
+  // Notificar al autor del target (post o respuesta padre).
+  // Errores aquí no rompen el flujo: la respuesta ya está creada.
+  try {
+    const targetRef = parentReplyId
+      ? doc(db, 'choponet_posts', postId, 'replies', parentReplyId)
+      : doc(db, 'choponet_posts', postId);
+    const targetSnap = await getDoc(targetRef);
+    if (targetSnap.exists()) {
+      const target = targetSnap.data();
+      await createNotification({
+        targetUid: target.authorUid,
+        actorProfile: profile,
+        type: parentReplyId ? 'reply-to-reply' : 'reply',
+        postId,
+        replyId: parentReplyId || null,
+        snippet: snippetOf(target.text)
+      });
+    }
+  } catch (err) {
+    console.error('No se pudo crear notificación de respuesta:', err);
   }
 
   return replyDoc;

@@ -15,11 +15,15 @@ import { subscribeFeed, subscribeFeedHot, subscribeByTag, createPost } from './p
 import { renderFeed, renderPostDetail } from './posts/posts-view.js';
 import { subscribeReplies, createReply } from './replies/replies-service.js';
 import { renderRepliesTree } from './replies/replies-view.js';
+import { subscribeNotifications, markAllAsRead } from './notifications/notifications-service.js';
+import { renderNotifications } from './notifications/notifications-view.js';
 
 let currentProfile = null;
 let unsubFeed = null;
 let unsubPostDetail = null;
 let unsubReplies = null;
+let unsubNotifs = null;
+let latestNotifs = [];
 let activePostId = null;
 
 const SORT_KEY = 'choponet:feed-sort';
@@ -136,6 +140,33 @@ registerRoute('/post/:id', ({ id }) => {
   });
 });
 
+registerRoute('/notifications', async () => {
+  if (!currentProfile) {
+    navigate('#/login');
+    return;
+  }
+  cleanupSubscriptions();
+  setBottomNavVisible(true);
+  showView('notifications');
+
+  const listEl = document.getElementById('notifs-list');
+  const markBtn = document.getElementById('btn-mark-read');
+  renderNotifications(latestNotifs, listEl);
+  markBtn.hidden = latestNotifs.every((n) => n.read);
+
+  // Auto-mark all as read después de 1.2s para que el user pueda ver
+  // qué estaba unread antes de que se marquen.
+  setTimeout(async () => {
+    if (window.location.hash !== '#/notifications') return;
+    try {
+      const marked = await markAllAsRead(currentProfile.uid);
+      if (marked > 0) markBtn.hidden = true;
+    } catch (err) {
+      console.error('No se pudo marcar como leídas:', err);
+    }
+  }, 1200);
+});
+
 registerRoute('/logout', async () => {
   await logout();
   showToast('Hasta luego, chopo', 'success');
@@ -149,6 +180,44 @@ function cleanupSubscriptions() {
   activePostId = null;
 }
 
+function updateBellBadge(notifs) {
+  const badge = document.getElementById('bell-badge');
+  const bell = document.getElementById('bell-btn');
+  if (!badge || !bell) return;
+  const unread = notifs.filter((n) => !n.read).length;
+  if (unread > 0) {
+    badge.textContent = unread > 99 ? '99+' : String(unread);
+    badge.hidden = false;
+    bell.classList.add('bell-has-unread');
+  } else {
+    badge.hidden = true;
+    bell.classList.remove('bell-has-unread');
+  }
+}
+
+function startNotificationsSubscription(uid) {
+  if (unsubNotifs) unsubNotifs();
+  document.getElementById('bell-btn').hidden = false;
+  unsubNotifs = subscribeNotifications(uid, (notifs) => {
+    latestNotifs = notifs;
+    updateBellBadge(notifs);
+    // Si el user está actualmente en la vista de notifs, re-render
+    const view = document.querySelector('.view[data-view="notifications"]');
+    if (view && !view.hidden) {
+      renderNotifications(notifs, document.getElementById('notifs-list'));
+    }
+  });
+}
+
+function stopNotificationsSubscription() {
+  if (unsubNotifs) { unsubNotifs(); unsubNotifs = null; }
+  latestNotifs = [];
+  const bell = document.getElementById('bell-btn');
+  if (bell) bell.hidden = true;
+  const badge = document.getElementById('bell-badge');
+  if (badge) badge.hidden = true;
+}
+
 // ---- Auth state ----
 // onAuthChange maneja dos casos: logout (limpiar y volver al login), y reload
 // con sesión existente (restaurar profile). Los handlers explícitos de login
@@ -160,6 +229,7 @@ onAuthChange(async (user) => {
     currentProfile = null;
     setUserTag(null);
     cleanupSubscriptions();
+    stopNotificationsSubscription();
     setBottomNavVisible(false);
     navigate('#/login');
     return;
@@ -171,6 +241,7 @@ onAuthChange(async (user) => {
     currentProfile = profile;
     setUserTag(profile.nick);
     setBottomNavVisible(true);
+    startNotificationsSubscription(profile.uid);
     if (!window.location.hash || window.location.hash === '#/login' || window.location.hash === '#/') {
       navigate('#/feed');
     }
@@ -185,6 +256,7 @@ async function applyProfileAndGoToFeed(profile, welcomeMsg) {
   currentProfile = profile;
   setUserTag(profile.nick);
   setBottomNavVisible(true);
+  startNotificationsSubscription(profile.uid);
   showToast(welcomeMsg, 'success');
   navigate('#/feed');
 }
@@ -269,6 +341,20 @@ document.getElementById('post-text').addEventListener('input', (e) => {
 
 document.getElementById('btn-back').addEventListener('click', () => navigate('#/feed'));
 document.getElementById('btn-tag-back').addEventListener('click', () => navigate('#/feed'));
+document.getElementById('btn-notifs-back').addEventListener('click', () => navigate('#/feed'));
+
+document.getElementById('bell-btn').addEventListener('click', () => navigate('#/notifications'));
+document.getElementById('btn-mark-read').addEventListener('click', async () => {
+  if (!currentProfile) return;
+  try {
+    await markAllAsRead(currentProfile.uid);
+    showToast('Marcadas como leídas', 'success');
+    document.getElementById('btn-mark-read').hidden = true;
+  } catch (err) {
+    console.error(err);
+    showToast('No pudimos marcarlas', 'error');
+  }
+});
 
 document.getElementById('form-reply').addEventListener('submit', async (e) => {
   e.preventDefault();

@@ -1,0 +1,191 @@
+/* Notifications — bell, badge y lista. Mobile-first siempre. */
+
+.header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+/* Bell icon en el header */
+
+.bell-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  font-size: 1.125rem;
+  transition: background var(--transition-fast);
+}
+
+.bell-btn:hover,
+.bell-btn:active {
+  background: var(--color-surface-2);
+}
+
+.bell-icon {
+  display: inline-block;
+  line-height: 1;
+}
+
+.bell-has-unread .bell-icon {
+  animation: bellShake 2400ms ease-in-out infinite;
+  transform-origin: top center;
+}
+
+@keyframes bellShake {
+  0%, 70%, 100% { transform: rotate(0deg); }
+  75% { transform: rotate(-12deg); }
+  80% { transform: rotate(10deg); }
+  85% { transform: rotate(-8deg); }
+  90% { transform: rotate(6deg); }
+  95% { transform: rotate(-2deg); }
+}
+
+.bell-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 5px;
+  background: var(--color-accent);
+  color: white;
+  border-radius: var(--radius-pill);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--color-surface);
+  line-height: 1;
+}
+
+/* Header de la vista de notifs */
+
+.notifs-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-md);
+  margin-bottom: var(--space-md);
+}
+
+.notifs-title {
+  font-size: var(--font-xl);
+  font-weight: 800;
+}
+
+.btn-mark-read {
+  padding: var(--space-sm) var(--space-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  color: var(--color-text-dim);
+  font-size: var(--font-sm);
+  font-weight: 600;
+  min-height: 36px;
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.btn-mark-read:hover,
+.btn-mark-read:active {
+  background: var(--color-accent-soft);
+  color: var(--color-accent);
+}
+
+/* Lista de notifs — cada notif es un button para tappabilidad nativa */
+
+.notifs-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.notif {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  width: 100%;
+  text-align: left;
+  padding: var(--space-md);
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+  min-height: 60px;
+}
+
+.notif:hover {
+  border-color: var(--color-border-strong);
+}
+
+.notif:active {
+  transform: scale(0.99);
+}
+
+.notif-unread {
+  background: linear-gradient(90deg, var(--color-accent-soft) 0%, var(--color-surface) 30%);
+  border-color: var(--color-accent-soft);
+}
+
+.notif-main {
+  flex: 1;
+  min-width: 0;
+}
+
+.notif-text {
+  font-size: var(--font-md);
+  line-height: 1.4;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+}
+
+.notif-text strong {
+  color: var(--color-accent);
+  font-weight: 700;
+}
+
+.notif-emoji {
+  display: inline-block;
+  font-size: 1.125rem;
+  vertical-align: middle;
+  margin: 0 2px;
+}
+
+.notif-snippet {
+  margin-top: 4px;
+  color: var(--color-text-dim);
+  font-size: var(--font-sm);
+  font-style: italic;
+  line-height: 1.4;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.notif-meta {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.notif-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  background: var(--color-accent);
+  border-radius: 50%;
+}
+
+.notif-time {
+  color: var(--color-text-muted);
+  font-size: var(--font-sm);
+  white-space: nowrap;
+}

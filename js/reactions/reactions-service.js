@@ -11,6 +11,7 @@ import {
   serverTimestamp
 } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
 import { db } from '../firebase-config.js';
+import { createNotification, snippetOf } from '../notifications/notifications-service.js';
 
 // Set de emojis con sabor "choperia": fuego, drama, risa, escándalo,
 // chisme/voyeur, payasería, verdad cruda, chisme con popcorn, palmada en la
@@ -65,6 +66,27 @@ export async function toggleReaction({ postId, replyId = null, emoji, profile })
       [fieldKey]: increment(1),
       reactionTotal: increment(1)
     });
+
+    // Notificar al autor del target. No bloqueante: si falla la notif, la
+    // reacción ya quedó persistida y el usuario no debe ver error.
+    try {
+      const targetSnap = await getDoc(targetRef);
+      if (targetSnap.exists()) {
+        const target = targetSnap.data();
+        await createNotification({
+          targetUid: target.authorUid,
+          actorProfile: profile,
+          type: replyId ? 'reaction-reply' : 'reaction-post',
+          postId,
+          replyId: replyId || null,
+          emoji,
+          snippet: snippetOf(target.text)
+        });
+      }
+    } catch (err) {
+      console.error('No se pudo crear notificación de reacción:', err);
+    }
+
     return true;
   }
 }
